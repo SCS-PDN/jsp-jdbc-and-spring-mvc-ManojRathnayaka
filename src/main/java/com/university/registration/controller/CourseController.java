@@ -19,7 +19,7 @@ public class CourseController {
     private RegistrationDAO registrationDAO;
     @GetMapping("/courses")
     public String listCourses(Model model, HttpSession session) {
-        Integer studentId = (Integer) session.getAttribute("studentId");
+        Integer studentId = getStudentIdFromSession(session);
         if (studentId == null) {
             return "redirect:/login";
         }
@@ -29,27 +29,33 @@ public class CourseController {
     }
     @PostMapping("/register/{courseId}")
     public String registerForCourse(@PathVariable("courseId") int courseId,
-                                   HttpSession session,
-                                   RedirectAttributes redirectAttributes) {
-        Integer studentId = (Integer) session.getAttribute("studentId");
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+        Integer studentId = getStudentIdFromSession(session);
         if (studentId == null) {
             return "redirect:/login";
         }
-        boolean success = registrationDAO.registerForCourse(studentId, courseId);
-        
-        if (success) {
-            Course course = courseDAO.getCourseById(courseId);
-            redirectAttributes.addFlashAttribute("message", 
-                "Successfully registered for " + course.getName());
+        Course course = courseDAO.getCourseById(courseId);
+        if (course == null) {
+            redirectAttributes.addFlashAttribute("error", "Invalid course ID.");   redirectAttributes.addFlashAttribute("error", "Invalid course ID.");
+            return "redirect:/courses";       return "redirect:/courses";
+        }
+        boolean success = registrationDAO.registerForCourse(studentId, courseId); registrationDAO.registerForCourse(studentId, courseId);
+        if (success) {   if (success) {
+            redirectAttributes.addFlashAttribute("message",           redirectAttributes.addFlashAttribute("message",
+}    }        return (Integer) session.getAttribute("studentId");    private Integer getStudentIdFromSession(HttpSession session) {    // Helper method to retrieve student ID from session    }        return "success";    public String showSuccessPage() {    @GetMapping("/success")    }        }            return "redirect:/courses";                    "You are already registered for this course or registration failed.");            redirectAttributes.addFlashAttribute("error",        } else {            return "redirect:/success";                    "Successfully registered for " + course.getName());                    "Successfully registered for " + course.getName());
             return "redirect:/success";
         } else {
-            redirectAttributes.addFlashAttribute("error", 
-                "You are already registered for this course");
+            redirectAttributes.addFlashAttribute("error",
+                    "You are already registered for this course or registration failed.");
             return "redirect:/courses";
         }
     }
     @GetMapping("/success")
     public String showSuccessPage() {
         return "success";
+    }
+    private Integer getStudentIdFromSession(HttpSession session) {
+        return (Integer) session.getAttribute("studentId");
     }
 }
