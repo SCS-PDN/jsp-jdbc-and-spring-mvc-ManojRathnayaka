@@ -37,13 +37,13 @@ public class CourseController {
         }
         Course course = courseDAO.getCourseById(courseId);
         if (course == null) {
-            redirectAttributes.addFlashAttribute("error", "Invalid course ID.");   redirectAttributes.addFlashAttribute("error", "Invalid course ID.");
-            return "redirect:/courses";       return "redirect:/courses";
+            redirectAttributes.addFlashAttribute("error", "Invalid course ID.");
+            return "redirect:/courses";
         }
-        boolean success = registrationDAO.registerForCourse(studentId, courseId); registrationDAO.registerForCourse(studentId, courseId);
-        if (success) {   if (success) {
-            redirectAttributes.addFlashAttribute("message",           redirectAttributes.addFlashAttribute("message",
-}    }        return (Integer) session.getAttribute("studentId");    private Integer getStudentIdFromSession(HttpSession session) {    // Helper method to retrieve student ID from session    }        return "success";    public String showSuccessPage() {    @GetMapping("/success")    }        }            return "redirect:/courses";                    "You are already registered for this course or registration failed.");            redirectAttributes.addFlashAttribute("error",        } else {            return "redirect:/success";                    "Successfully registered for " + course.getName());                    "Successfully registered for " + course.getName());
+        boolean success = registrationDAO.registerForCourse(studentId, courseId);
+        if (success) {
+            redirectAttributes.addFlashAttribute("message",
+                    "Successfully registered for " + course.getName());
             return "redirect:/success";
         } else {
             redirectAttributes.addFlashAttribute("error",
